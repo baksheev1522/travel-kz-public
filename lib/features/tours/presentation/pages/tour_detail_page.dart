@@ -12,6 +12,7 @@ import '../../../../data/services/bonus_service.dart';
 import '../../../../data/services/wishlist_service.dart';
 import '../../../../core/utils/share_utils.dart';
 import '../../../../core/widgets/story_viewer.dart';
+import 'price_calendar_sheet.dart';
 
 class TourDetailPage extends StatefulWidget {
   final String tourId;
@@ -37,6 +38,46 @@ class _TourDetailPageState extends State<TourDetailPage>
   int _currentImage = 0;
   late TabController _tabCtrl;
   bool _likesSelected = true;
+
+  // ── Календарь цен: выбранные дата/ночи/цена ────────────────────
+  DateTime? _selectedDate;
+  int? _selectedNights;
+  double? _selectedPrice;
+
+  int get _nightsToShow => _selectedNights ?? _tour?.nights ?? 7;
+  double get _priceToShow => _selectedPrice ?? _tour?.price ?? 0;
+  DateTime get _dateToShow =>
+      _selectedDate ?? DateTime.now().add(const Duration(days: 3));
+
+  String get _datesLabel {
+    final start = _dateToShow;
+    final end = start.add(Duration(days: _nightsToShow));
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${two(start.day)}.${two(start.month)} — ${two(end.day)}.${two(end.month)}, $_nightsToShow ночей';
+  }
+
+  void _openPriceCalendar(BuildContext context) async {
+    if (_tour == null) return;
+    final result = await showModalBottomSheet<PriceCalendarResult>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => PriceCalendarSheet(
+        tour: _tour!,
+        initialDate: _dateToShow,
+        initialNights: _nightsToShow,
+      ),
+    );
+    if (result != null && mounted) {
+      setState(() {
+        _selectedDate = result.departureDate;
+        _selectedNights = result.nights;
+        _selectedPrice = result.price;
+      });
+    }
+  }
 
   final _repo = TourRepository();
   final _reviewService = ReviewService();
@@ -435,6 +476,43 @@ class _TourDetailPageState extends State<TourDetailPage>
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
                           color: AppColors.grey900,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // ── Даты и ночи (открывает календарь цен) ─────
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: GestureDetector(
+                        onTap: () => _openPriceCalendar(context),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: AppColors.grey100,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.calendar_today_outlined,
+                                  size: 18, color: AppColors.primary),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _datesLabel,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.grey900,
+                                  ),
+                                ),
+                              ),
+                              const Icon(Icons.keyboard_arrow_right,
+                                  size: 20, color: AppColors.grey500),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -917,7 +995,7 @@ class _TourDetailPageState extends State<TourDetailPage>
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (_tour!.hasDiscount)
+                      if (_selectedPrice == null && _tour!.hasDiscount)
                         Text(
                           '${_fmt(_tour!.originalPrice)} ₸',
                           style: const TextStyle(
@@ -927,16 +1005,17 @@ class _TourDetailPageState extends State<TourDetailPage>
                           ),
                         ),
                       Text(
-                        '${_fmt(_tour!.price)} ₸',
+                        '${_fmt(_priceToShow)} ₸',
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
                           color: AppColors.grey900,
                         ),
                       ),
-                      const Text(
-                        'за 2 взрослых · перелёт включён',
-                        style: TextStyle(
+                      Text(
+                        'за 2 взрослых · $_nightsToShow ноч'
+                        '${_nightsToShow == 1 ? 'ь' : _nightsToShow < 5 ? 'и' : 'ей'}',
+                        style: const TextStyle(
                             fontSize: 11, color: AppColors.grey500),
                       ),
                     ],

@@ -56,10 +56,28 @@ class _TourListPageState extends State<TourListPage> {
       } else {
         tours = await _repo.getTours();
       }
-      if (mounted) setState(() { _tours = tours; _loading = false; });
+      if (mounted)
+        setState(() {
+          _tours = tours;
+          _loading = false;
+        });
     } catch (_) {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  // ── НОВОЕ: парсим диапазон ночей из строки фильтра ──────────────
+  // Строка приходит в виде "4 — 11 ночей" (из tour_search_form.dart)
+  (int, int)? get _nightsRange {
+    final raw = widget.filters?['nights'] as String?;
+    if (raw == null) return null;
+    // Достаём все числа из строки
+    final numbers = RegExp(r'\d+')
+        .allMatches(raw)
+        .map((m) => int.parse(m.group(0)!))
+        .toList();
+    if (numbers.length < 2) return null;
+    return (numbers[0], numbers[1]);
   }
 
   List<Tour> get _sorted {
@@ -67,11 +85,12 @@ class _TourListPageState extends State<TourListPage> {
 
     if (_searchQuery.isNotEmpty) {
       final q = _searchQuery.toLowerCase();
-      list = list.where((t) =>
-        t.hotelName.toLowerCase().contains(q) ||
-        t.city.toLowerCase().contains(q) ||
-        t.country.toLowerCase().contains(q)
-      ).toList();
+      list = list
+          .where((t) =>
+              t.hotelName.toLowerCase().contains(q) ||
+              t.city.toLowerCase().contains(q) ||
+              t.country.toLowerCase().contains(q))
+          .toList();
     }
 
     if (_starsFilter != null) {
@@ -82,10 +101,20 @@ class _TourListPageState extends State<TourListPage> {
       list = list.where((t) => t.mealType == _mealFilter).toList();
     }
 
+    // ── НОВОЕ: фильтр по количеству ночей ──────────────────────────
+    final range = _nightsRange;
+    if (range != null) {
+      final (min, max) = range;
+      list = list.where((t) => t.nights >= min && t.nights <= max).toList();
+    }
+
     switch (_sort) {
-      case 'Сначала дешёвые': list.sort((a, b) => a.price.compareTo(b.price));
-      case 'Сначала дорогие': list.sort((a, b) => b.price.compareTo(a.price));
-      case 'По рейтингу':     list.sort((a, b) => b.rating.compareTo(a.rating));
+      case 'Сначала дешёвые':
+        list.sort((a, b) => a.price.compareTo(b.price));
+      case 'Сначала дорогие':
+        list.sort((a, b) => b.price.compareTo(a.price));
+      case 'По рейтингу':
+        list.sort((a, b) => b.rating.compareTo(a.rating));
     }
     return list;
   }
@@ -121,7 +150,9 @@ class _TourListPageState extends State<TourListPage> {
           children: [
             Text(_title,
                 style: const TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white)),
             if (_subtitle.isNotEmpty)
               Text(_subtitle,
                   style: const TextStyle(fontSize: 11, color: Colors.white70)),
@@ -150,14 +181,14 @@ class _TourListPageState extends State<TourListPage> {
                 decoration: const InputDecoration(
                   hintText: 'Поиск отеля',
                   hintStyle: TextStyle(color: AppColors.grey500, fontSize: 14),
-                  prefixIcon: Icon(Icons.search, color: AppColors.grey500, size: 18),
+                  prefixIcon:
+                      Icon(Icons.search, color: AppColors.grey500, size: 18),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(vertical: 10),
                 ),
               ),
             ),
           ),
-
           Container(
             color: Colors.white,
             padding: const EdgeInsets.only(bottom: 10),
@@ -173,17 +204,20 @@ class _TourListPageState extends State<TourListPage> {
                   ),
                   const SizedBox(width: 8),
                   _DropChip(
-                    label: _starsFilter == null ? 'Звёздность' : '$_starsFilter★+',
+                    label:
+                        _starsFilter == null ? 'Звёздность' : '$_starsFilter★+',
                     active: _starsFilter != null,
                     onTap: () => showModalBottomSheet(
                       context: context,
                       shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(20))),
                       builder: (_) => Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const SizedBox(height: 16),
-                          const Text('Звёздность', style: AppTextStyles.headlineMedium),
+                          const Text('Звёздность',
+                              style: AppTextStyles.headlineMedium),
                           const SizedBox(height: 8),
                           ...{
                             'Любая': null,
@@ -191,15 +225,17 @@ class _TourListPageState extends State<TourListPage> {
                             '4★+': 4,
                             '3★+': 3,
                           }.entries.map((e) => ListTile(
-                            title: Text(e.key, style: AppTextStyles.bodyLarge),
-                            trailing: _starsFilter == e.value
-                                ? const Icon(Icons.check, color: AppColors.primary)
-                                : null,
-                            onTap: () {
-                              setState(() => _starsFilter = e.value);
-                              Navigator.pop(context);
-                            },
-                          )),
+                                title:
+                                    Text(e.key, style: AppTextStyles.bodyLarge),
+                                trailing: _starsFilter == e.value
+                                    ? const Icon(Icons.check,
+                                        color: AppColors.primary)
+                                    : null,
+                                onTap: () {
+                                  setState(() => _starsFilter = e.value);
+                                  Navigator.pop(context);
+                                },
+                              )),
                           const SizedBox(height: 16),
                         ],
                       ),
@@ -212,24 +248,31 @@ class _TourListPageState extends State<TourListPage> {
                     onTap: () => showModalBottomSheet(
                       context: context,
                       shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(20))),
                       builder: (_) => Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const SizedBox(height: 16),
-                          const Text('Питание', style: AppTextStyles.headlineMedium),
+                          const Text('Питание',
+                              style: AppTextStyles.headlineMedium),
                           const SizedBox(height: 8),
-                          ...['Любое', 'All Inclusive', 'Завтраки', 'Полупансион']
-                              .map((o) => ListTile(
-                            title: Text(o, style: AppTextStyles.bodyLarge),
-                            trailing: _mealFilter == o
-                                ? const Icon(Icons.check, color: AppColors.primary)
-                                : null,
-                            onTap: () {
-                              setState(() => _mealFilter = o);
-                              Navigator.pop(context);
-                            },
-                          )),
+                          ...[
+                            'Любое',
+                            'All Inclusive',
+                            'Завтраки',
+                            'Полупансион'
+                          ].map((o) => ListTile(
+                                title: Text(o, style: AppTextStyles.bodyLarge),
+                                trailing: _mealFilter == o
+                                    ? const Icon(Icons.check,
+                                        color: AppColors.primary)
+                                    : null,
+                                onTap: () {
+                                  setState(() => _mealFilter = o);
+                                  Navigator.pop(context);
+                                },
+                              )),
                           const SizedBox(height: 16),
                         ],
                       ),
@@ -239,17 +282,15 @@ class _TourListPageState extends State<TourListPage> {
               ),
             ),
           ),
-
           const Divider(height: 1),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(children: [
               Text('Найдено: ${tours.length} туров',
-                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey600)),
+                  style: AppTextStyles.bodySmall
+                      .copyWith(color: AppColors.grey600)),
             ]),
           ),
-
           Expanded(
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
@@ -293,9 +334,9 @@ class _TourResultCardState extends State<_TourResultCard> {
   @override
   void initState() {
     super.initState();
-    _wishlistSub = _wishlistService
-        .streamContains(widget.tour.id)
-        .listen((v) { if (mounted) setState(() => _inWishlist = v); });
+    _wishlistSub = _wishlistService.streamContains(widget.tour.id).listen((v) {
+      if (mounted) setState(() => _inWishlist = v);
+    });
   }
 
   @override
@@ -339,7 +380,8 @@ class _TourResultCardState extends State<_TourResultCard> {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 12, offset: const Offset(0, 2),
+              blurRadius: 12,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -349,18 +391,22 @@ class _TourResultCardState extends State<_TourResultCard> {
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(16)),
                   child: CachedNetworkImage(
                     imageUrl: tour.imageUrls.isNotEmpty
                         ? tour.imageUrls[_currentImage]
                         : tour.imageUrl,
-                    height: 200, width: double.infinity, fit: BoxFit.cover,
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
                     errorWidget: (_, __, ___) =>
                         Container(height: 200, color: AppColors.grey200),
                   ),
                 ),
                 Positioned(
-                  top: 10, left: 10,
+                  top: 10,
+                  left: 10,
                   child: Row(
                     children: [
                       _MediaBadge(icon: Icons.videocam_outlined, count: 3),
@@ -373,52 +419,73 @@ class _TourResultCardState extends State<_TourResultCard> {
                 ),
                 if (tour.rating >= 4.7)
                   Positioned(
-                    bottom: 10, left: 10,
+                    bottom: 10,
+                    left: 10,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: AppColors.primary,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Row(
                         children: [
-                          Icon(Icons.thumb_up_outlined, color: Colors.white, size: 14),
+                          Icon(Icons.thumb_up_outlined,
+                              color: Colors.white, size: 14),
                           SizedBox(width: 4),
                           Text('TravelKZ рекомендует',
-                              style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w600)),
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600)),
                         ],
                       ),
                     ),
                   ),
                 if (tour.imageUrls.length > 1)
                   Positioned(
-                    bottom: 10, left: 0, right: 0,
+                    bottom: 10,
+                    left: 0,
+                    right: 0,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(tour.imageUrls.length, (i) => Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 2),
-                        width: _currentImage == i ? 16 : 6, height: 6,
-                        decoration: BoxDecoration(
-                          color: _currentImage == i ? Colors.white : Colors.white54,
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                      )),
+                      children: List.generate(
+                          tour.imageUrls.length,
+                          (i) => Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 2),
+                                width: _currentImage == i ? 16 : 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: _currentImage == i
+                                      ? Colors.white
+                                      : Colors.white54,
+                                  borderRadius: BorderRadius.circular(3),
+                                ),
+                              )),
                     ),
                   ),
                 Positioned(
-                  top: 10, right: 10,
+                  top: 10,
+                  right: 10,
                   child: GestureDetector(
                     onTap: _toggleWishlist,
                     child: Container(
-                      width: 34, height: 34,
+                      width: 34,
+                      height: 34,
                       decoration: BoxDecoration(
-                        color: Colors.white, shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1), blurRadius: 8)],
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 8)
+                        ],
                       ),
                       child: Icon(
                         _inWishlist ? Icons.favorite : Icons.favorite_outline,
-                        color: _inWishlist ? AppColors.error : AppColors.grey500,
+                        color:
+                            _inWishlist ? AppColors.error : AppColors.grey500,
                         size: 18,
                       ),
                     ),
@@ -434,46 +501,64 @@ class _TourResultCardState extends State<_TourResultCard> {
                   Row(
                     children: [
                       Row(children: [
-                        ...List.generate(tour.stars, (_) =>
-                            const Icon(Icons.star, color: AppColors.warning, size: 16)),
-                        ...List.generate(5 - tour.stars, (_) =>
-                            const Icon(Icons.star_outline, color: AppColors.warning, size: 16)),
+                        ...List.generate(
+                            tour.stars,
+                            (_) => const Icon(Icons.star,
+                                color: AppColors.warning, size: 16)),
+                        ...List.generate(
+                            5 - tour.stars,
+                            (_) => const Icon(Icons.star_outline,
+                                color: AppColors.warning, size: 16)),
                       ]),
                       const Spacer(),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: const Color(0xFF003580),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(tour.rating.toStringAsFixed(1),
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
+                            style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white)),
                       ),
                       const SizedBox(width: 6),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text('Booking.com',
-                              style: TextStyle(fontSize: 10, color: Color(0xFF003580), fontWeight: FontWeight.w600)),
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  color: Color(0xFF003580),
+                                  fontWeight: FontWeight.w600)),
                           Text('${tour.reviewsCount} отзывов',
-                              style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey500)),
+                              style: AppTextStyles.bodySmall
+                                  .copyWith(color: AppColors.grey500)),
                         ],
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text('${tour.hotelName} ${tour.stars}*',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.grey900)),
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.grey900)),
                   const SizedBox(height: 2),
                   Text('${tour.country}, ${tour.city}',
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey500)),
+                      style: AppTextStyles.bodySmall
+                          .copyWith(color: AppColors.grey500)),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.beach_access_outlined, size: 16, color: AppColors.grey500),
+                      const Icon(Icons.beach_access_outlined,
+                          size: 16, color: AppColors.grey500),
                       const SizedBox(width: 4),
                       Text('Песчаный пляж',
-                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey600)),
+                          style: AppTextStyles.bodySmall
+                              .copyWith(color: AppColors.grey600)),
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -486,9 +571,11 @@ class _TourResultCardState extends State<_TourResultCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('Цена за ${tour.nights} ночей',
-                              style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey500)),
+                              style: AppTextStyles.bodySmall
+                                  .copyWith(color: AppColors.grey500)),
                           Text(widget.tourists,
-                              style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey500)),
+                              style: AppTextStyles.bodySmall
+                                  .copyWith(color: AppColors.grey500)),
                         ],
                       ),
                       const Spacer(),
@@ -497,12 +584,20 @@ class _TourResultCardState extends State<_TourResultCard> {
                         children: [
                           if (tour.hasDiscount)
                             Text('${_fmt(tour.originalPrice)} ₸',
-                                style: const TextStyle(fontSize: 12, color: AppColors.grey400,
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.grey400,
                                     decoration: TextDecoration.lineThrough)),
                           Text('${_fmt(tour.price)} ₸',
-                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.grey900)),
+                              style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.grey900)),
                           const Text('перелет включён',
-                              style: TextStyle(fontSize: 11, color: AppColors.primary, fontWeight: FontWeight.w500)),
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w500)),
                         ],
                       ),
                     ],
@@ -535,7 +630,10 @@ class _MediaBadge extends StatelessWidget {
           Icon(icon, color: Colors.white, size: 13),
           const SizedBox(width: 3),
           Text('$count',
-              style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -547,7 +645,8 @@ class _DropChip extends StatelessWidget {
   final bool active;
   final VoidCallback onTap;
 
-  const _DropChip({required this.label, required this.active, required this.onTap});
+  const _DropChip(
+      {required this.label, required this.active, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -557,16 +656,21 @@ class _DropChip extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: active ? AppColors.primary.withValues(alpha: 0.1) : Colors.white,
+          color:
+              active ? AppColors.primary.withValues(alpha: 0.1) : Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: active ? AppColors.primary : AppColors.grey300),
+          border:
+              Border.all(color: active ? AppColors.primary : AppColors.grey300),
         ),
         child: Row(
           children: [
             Text(label,
-                style: TextStyle(fontSize: 13, color: active ? AppColors.primary : AppColors.grey700)),
+                style: TextStyle(
+                    fontSize: 13,
+                    color: active ? AppColors.primary : AppColors.grey700)),
             const SizedBox(width: 4),
-            Icon(Icons.keyboard_arrow_down, size: 16,
+            Icon(Icons.keyboard_arrow_down,
+                size: 16,
                 color: active ? AppColors.primary : AppColors.grey500),
           ],
         ),
@@ -580,7 +684,8 @@ class _SortChip extends StatelessWidget {
   final List<String> options;
   final ValueChanged<String> onChange;
 
-  const _SortChip({required this.current, required this.options, required this.onChange});
+  const _SortChip(
+      {required this.current, required this.options, required this.onChange});
 
   @override
   Widget build(BuildContext context) {
@@ -600,7 +705,10 @@ class _SortChip extends StatelessWidget {
                   trailing: o == current
                       ? const Icon(Icons.check, color: AppColors.primary)
                       : null,
-                  onTap: () { Navigator.pop(context); onChange(o); },
+                  onTap: () {
+                    Navigator.pop(context);
+                    onChange(o);
+                  },
                 )),
             const SizedBox(height: 16),
           ],
@@ -617,7 +725,8 @@ class _SortChip extends StatelessWidget {
           children: [
             Icon(Icons.swap_vert, size: 16, color: AppColors.grey700),
             SizedBox(width: 4),
-            Text('Сортировка', style: TextStyle(fontSize: 13, color: AppColors.grey700)),
+            Text('Сортировка',
+                style: TextStyle(fontSize: 13, color: AppColors.grey700)),
           ],
         ),
       ),

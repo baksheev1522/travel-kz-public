@@ -30,7 +30,11 @@ class _TourSearchFormState extends State<TourSearchForm>
   late final Animation<double> _arrowAnim;
 
   static const _starOptions = [
-    'Все отели', '5 звёзд', '4 звезды', '3 звезды', '2 звезды',
+    'Все отели',
+    '5 звёзд',
+    '4 звезды',
+    '3 звезды',
+    '2 звезды',
   ];
 
   static const _mealOptions = [
@@ -44,18 +48,62 @@ class _TourSearchFormState extends State<TourSearchForm>
   ];
 
   static const _cities = [
-    'Алматы', 'Астана', 'Шымкент', 'Актобе',
-    'Актау', 'Атырау', 'Костанай', 'Павлодар',
-    'Уральск', 'Усть-Каменогорск', 'Петропавловск',
+    'Алматы',
+    'Астана',
+    'Шымкент',
+    'Актобе',
+    'Актау',
+    'Атырау',
+    'Костанай',
+    'Павлодар',
+    'Уральск',
+    'Усть-Каменогорск',
+    'Петропавловск',
   ];
 
   static const _countries = [
-    {'name': 'Вьетнам', 'visa': 'Без визы', 'resorts': 'Нячанг, Фантхьет, Дананг, Фукуок', 'url': 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=100'},
-    {'name': 'Египет', 'visa': 'Виза по прилету', 'resorts': 'Шарм-эль-Шейх, Дахаб, Хургада', 'url': 'https://images.unsplash.com/photo-1539768942893-daf53e448371?w=100'},
-    {'name': 'Таиланд', 'visa': 'Без визы', 'resorts': 'Пхукет, Паттайя, Краби, Бангкок', 'url': 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=100'},
-    {'name': 'Турция', 'visa': 'Без визы', 'resorts': 'Аланья, Кемер, Сиде, Белек, Анталья', 'url': 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=100'},
-    {'name': 'Мальдивы', 'visa': 'Без визы', 'resorts': 'Мале, Атолл Южный Мале', 'url': 'https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=100'},
-    {'name': 'ОАЭ', 'visa': 'Без визы', 'resorts': 'Дубай, Абу-Даби, Шарджа', 'url': 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=100'},
+    {
+      'name': 'Вьетнам',
+      'visa': 'Без визы',
+      'resorts': 'Нячанг, Фантхьет, Дананг, Фукуок',
+      'url':
+          'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=100'
+    },
+    {
+      'name': 'Египет',
+      'visa': 'Виза по прилету',
+      'resorts': 'Шарм-эль-Шейх, Дахаб, Хургада',
+      'url':
+          'https://images.unsplash.com/photo-1539768942893-daf53e448371?w=100'
+    },
+    {
+      'name': 'Таиланд',
+      'visa': 'Без визы',
+      'resorts': 'Пхукет, Паттайя, Краби, Бангкок',
+      'url':
+          'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=100'
+    },
+    {
+      'name': 'Турция',
+      'visa': 'Без визы',
+      'resorts': 'Аланья, Кемер, Сиде, Белек, Анталья',
+      'url':
+          'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=100'
+    },
+    {
+      'name': 'Мальдивы',
+      'visa': 'Без визы',
+      'resorts': 'Мале, Атолл Южный Мале',
+      'url':
+          'https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=100'
+    },
+    {
+      'name': 'ОАЭ',
+      'visa': 'Без визы',
+      'resorts': 'Дубай, Абу-Даби, Шарджа',
+      'url':
+          'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=100'
+    },
   ];
 
   @override
@@ -64,7 +112,8 @@ class _TourSearchFormState extends State<TourSearchForm>
     final now = DateTime.now();
     final start = now.add(const Duration(days: 3));
     final end = start.add(const Duration(days: 7));
-    _dates = '${start.day}.${start.month.toString().padLeft(2,'0')} — ${end.day}.${end.month.toString().padLeft(2,'0')}';
+    _dates =
+        '${start.day}.${start.month.toString().padLeft(2, '0')} — ${end.day}.${end.month.toString().padLeft(2, '0')}';
     _animCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),
@@ -234,7 +283,7 @@ class _TourSearchFormState extends State<TourSearchForm>
                   'stars': _stars == 'Все отели' ? null : _stars,
                   'meal': _meal == 'Любое' ? null : _meal,
                   'dates': _dates,
-                  'nights': _nights, 
+                  'nights': _nights,
                   'tourists': _tourists,
                 });
               },
@@ -353,8 +402,7 @@ class _TourSearchFormState extends State<TourSearchForm>
                 child: const TextField(
                   decoration: InputDecoration(
                     hintText: 'Страна, курорт, отель',
-                    prefixIcon:
-                        Icon(Icons.search, color: AppColors.grey500),
+                    prefixIcon: Icon(Icons.search, color: AppColors.grey500),
                     border: InputBorder.none,
                   ),
                 ),
@@ -370,20 +418,20 @@ class _TourSearchFormState extends State<TourSearchForm>
                 itemBuilder: (_, i) {
                   final c = _countries[i];
                   return ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 4),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     leading: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: CachedNetworkImage(
                         imageUrl: c['url']!,
-                        width: 52, height: 52, fit: BoxFit.cover,
+                        width: 52,
+                        height: 52,
+                        fit: BoxFit.cover,
                         errorWidget: (_, __, ___) => Container(
-                            width: 52, height: 52,
-                            color: AppColors.grey200),
+                            width: 52, height: 52, color: AppColors.grey200),
                       ),
                     ),
-                    title: Text(c['name']!,
-                        style: AppTextStyles.titleMedium),
+                    title: Text(c['name']!, style: AppTextStyles.titleMedium),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -510,8 +558,8 @@ class _PickerSheetState extends State<_PickerSheet> {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
                 margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                   color: selected
                       ? AppColors.primary.withValues(alpha: 0.08)
@@ -546,9 +594,8 @@ class _PickerSheetState extends State<_PickerSheet> {
                         color: selected ? AppColors.primary : Colors.white,
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
-                          color: selected
-                              ? AppColors.primary
-                              : AppColors.grey300,
+                          color:
+                              selected ? AppColors.primary : AppColors.grey300,
                         ),
                       ),
                       child: selected
@@ -576,8 +623,7 @@ class _PickerSheetState extends State<_PickerSheet> {
                     borderRadius: BorderRadius.circular(12)),
               ),
               child: const Text('Выбрать',
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w700)),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
             ),
           ),
         ],
@@ -648,8 +694,7 @@ class _DatePickerSheetState extends State<_DatePickerSheet> {
                         Text('Кол-во ночей',
                             style: AppTextStyles.bodySmall
                                 .copyWith(color: AppColors.grey500)),
-                        const Text('4 — 14',
-                            style: AppTextStyles.titleMedium),
+                        const Text('4 — 14', style: AppTextStyles.titleMedium),
                       ],
                     ),
                   ),
@@ -739,8 +784,19 @@ class _MonthCalendar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const monthNames = [
-      '', 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
+      '',
+      'Январь',
+      'Февраль',
+      'Март',
+      'Апрель',
+      'Май',
+      'Июнь',
+      'Июль',
+      'Август',
+      'Сентябрь',
+      'Октябрь',
+      'Ноябрь',
+      'Декабрь',
     ];
     final firstDay = DateTime(month.year, month.month, 1);
     final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
@@ -762,8 +818,8 @@ class _MonthCalendar extends StatelessWidget {
             itemCount: startWeekday + daysInMonth,
             itemBuilder: (_, i) {
               if (i < startWeekday) return const SizedBox();
-              final day = DateTime(
-                  month.year, month.month, i - startWeekday + 1);
+              final day =
+                  DateTime(month.year, month.month, i - startWeekday + 1);
               final isStart = start != null &&
                   day.year == start!.year &&
                   day.month == start!.month &&
@@ -776,8 +832,8 @@ class _MonthCalendar extends StatelessWidget {
                   end != null &&
                   day.isAfter(start!) &&
                   day.isBefore(end!);
-              final isPast = day.isBefore(
-                  DateTime.now().subtract(const Duration(days: 1)));
+              final isPast = day
+                  .isBefore(DateTime.now().subtract(const Duration(days: 1)));
               return GestureDetector(
                 onTap: isPast ? null : () => onDayTap(day),
                 child: Container(
@@ -839,33 +895,67 @@ class _NightsSheetState extends State<_NightsSheet> {
         children: [
           const _Handle(),
           const SizedBox(height: 16),
-          const Text('Количество ночей',
-              style: AppTextStyles.headlineMedium),
+          const Text('Количество ночей', style: AppTextStyles.headlineMedium),
           const SizedBox(height: 24),
+
+          // ── "От" ──────────────────────────────────────────────
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              CounterButton(
-                  icon: Icons.remove,
-                  onTap: _from > 1
-                      ? () => setState(() => _from--)
-                      : null),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text('$_from — $_to',
-                    style: AppTextStyles.headlineLarge),
+              const Text('От', style: AppTextStyles.bodyLarge),
+              Row(
+                children: [
+                  CounterButton(
+                    icon: Icons.remove,
+                    onTap: _from > 1 ? () => setState(() => _from--) : null,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text('$_from', style: AppTextStyles.headlineMedium),
+                  ),
+                  CounterButton(
+                    icon: Icons.add,
+                    // Не даём "от" перепрыгнуть "до"
+                    onTap: _from < _to ? () => setState(() => _from++) : null,
+                  ),
+                ],
               ),
-              CounterButton(
-                  icon: Icons.add,
-                  onTap: _to < 30
-                      ? () => setState(() => _to++)
-                      : null),
             ],
           ),
+          const SizedBox(height: 16),
+
+          // ── "До" ──────────────────────────────────────────────
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('До', style: AppTextStyles.bodyLarge),
+              Row(
+                children: [
+                  CounterButton(
+                    icon: Icons.remove,
+                    // Не даём "до" уйти ниже "от"
+                    onTap: _to > _from ? () => setState(() => _to--) : null,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text('$_to', style: AppTextStyles.headlineMedium),
+                  ),
+                  CounterButton(
+                    icon: Icons.add,
+                    onTap: _to < 30 ? () => setState(() => _to++) : null,
+                  ),
+                ],
+              ),
+            ],
+          ),
+
           const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () => widget.onConfirm('$_from — $_to ночей'),
-            child: const Text('Выбрать'),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => widget.onConfirm('$_from — $_to ночей'),
+              child: const Text('Выбрать'),
+            ),
           ),
         ],
       ),
@@ -891,9 +981,23 @@ class _TouristsSheetState extends State<_TouristsSheet> {
   bool _twoRooms = false;
 
   static const _ageLabels = [
-    'До года', '1', '2', '3', '4',
-    '5', '6', '7', '8', '9', '10',
-    '11', '12', '13', '14', '15', '16',
+    'До года',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+    '11',
+    '12',
+    '13',
+    '14',
+    '15',
+    '16',
   ];
 
   String _ageLabel(int age) =>
@@ -927,8 +1031,7 @@ class _TouristsSheetState extends State<_TouristsSheet> {
               children: [
                 const _Handle(),
                 const SizedBox(height: 16),
-                const Text('Кто летит ?',
-                    style: AppTextStyles.headlineMedium),
+                const Text('Кто летит ?', style: AppTextStyles.headlineMedium),
                 const SizedBox(height: 16),
               ],
             ),
@@ -939,7 +1042,9 @@ class _TouristsSheetState extends State<_TouristsSheet> {
             child: ListView(
               controller: ctrl,
               padding: EdgeInsets.fromLTRB(
-                20, 0, 20,
+                20,
+                0,
+                20,
                 MediaQuery.of(context).padding.bottom + 16,
               ),
               children: [
@@ -1012,8 +1117,7 @@ class _TouristsSheetState extends State<_TouristsSheet> {
                             final isFirst = label == 'До года';
                             return GestureDetector(
                               onTap: () {
-                                final age =
-                                    isFirst ? -1 : int.parse(label);
+                                final age = isFirst ? -1 : int.parse(label);
                                 setState(() {
                                   _children.add(age);
                                   _showAgePicker = false;
@@ -1061,8 +1165,7 @@ class _TouristsSheetState extends State<_TouristsSheet> {
                       ),
                       child: const Row(
                         children: [
-                          Icon(Icons.add,
-                              color: AppColors.primary, size: 18),
+                          Icon(Icons.add, color: AppColors.primary, size: 18),
                           SizedBox(width: 8),
                           Text(
                             'Добавить ребенка',
@@ -1091,8 +1194,7 @@ class _TouristsSheetState extends State<_TouristsSheet> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('👨‍👩‍👧',
-                            style: TextStyle(fontSize: 24)),
+                        const Text('👨‍👩‍👧', style: TextStyle(fontSize: 24)),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
@@ -1108,17 +1210,15 @@ class _TouristsSheetState extends State<_TouristsSheet> {
                   ),
                   const SizedBox(height: 10),
                   GestureDetector(
-                    onTap: () =>
-                        setState(() => _twoRooms = !_twoRooms),
+                    onTap: () => setState(() => _twoRooms = !_twoRooms),
                     child: Row(
                       children: [
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 150),
-                          width: 22, height: 22,
+                          width: 22,
+                          height: 22,
                           decoration: BoxDecoration(
-                            color: _twoRooms
-                                ? AppColors.primary
-                                : Colors.white,
+                            color: _twoRooms ? AppColors.primary : Colors.white,
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
                               color: _twoRooms
@@ -1194,8 +1294,7 @@ class _ChildCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Ребенок',
-                  style: TextStyle(
-                      fontSize: 15, fontWeight: FontWeight.w600)),
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
               Text(ageLabel,
                   style: AppTextStyles.bodySmall
                       .copyWith(color: AppColors.grey500)),
@@ -1205,13 +1304,13 @@ class _ChildCard extends StatelessWidget {
           GestureDetector(
             onTap: onRemove,
             child: Container(
-              width: 36, height: 36,
+              width: 36,
+              height: 36,
               decoration: const BoxDecoration(
                 color: AppColors.primary,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.remove,
-                  color: Colors.white, size: 18),
+              child: const Icon(Icons.remove, color: Colors.white, size: 18),
             ),
           ),
         ],
@@ -1269,14 +1368,14 @@ class _RoundBtn extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 36, height: 36,
+        width: 36,
+        height: 36,
         decoration: BoxDecoration(
           color: onTap != null ? AppColors.primary : AppColors.grey200,
           shape: BoxShape.circle,
         ),
         child: Icon(icon,
-            color: onTap != null ? Colors.white : AppColors.grey400,
-            size: 18),
+            color: onTap != null ? Colors.white : AppColors.grey400, size: 18),
       ),
     );
   }
