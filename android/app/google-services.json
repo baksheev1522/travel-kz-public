@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "997349703277",
+    "project_id": "clone-ht-8324c",
+    "storage_bucket": "clone-ht-8324c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:997349703277:android:67cd52cd3ebacb4ac08964",
+        "android_client_info": {
+          "package_name": "com.example.travel_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-6zu5p3ZXSILWswIy_QsRXwdykc41pWI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
