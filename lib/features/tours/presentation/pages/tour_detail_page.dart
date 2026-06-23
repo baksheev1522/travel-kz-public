@@ -1074,6 +1074,8 @@ class _TourDetailPageState extends State<TourDetailPage>
         tour: _tour!,
         departureCity: widget.departureCity,
         tourists: widget.tourists,
+        overridePrice: _selectedPrice,
+        overrideNights: _selectedNights,
       ),
     );
   }
@@ -1342,10 +1344,14 @@ class _BookingSheet extends StatefulWidget {
   final Tour tour;
   final String departureCity;
   final String tourists;
+  final double? overridePrice;
+  final int? overrideNights;
   const _BookingSheet({
   required this.tour,
   required this.departureCity,
   this.tourists = '2 взрослых', // ← добавь
+  this.overridePrice,
+  this.overrideNights,
 });
  
   @override
@@ -1407,7 +1413,14 @@ class _BookingSheetState extends State<_BookingSheet>
     if (mounted) setState(() { _bonusBalance = balance; _loadingBonuses = false; });
   }
  
-  double get _total => widget.tour.price * (_adults + _children * 0.7);
+  // Цена из календаря рассчитана "за 2 взрослых" (см. price_calendar_sheet.dart
+  // и подпись "за 2 взрослых" на экране тура), а исходная tour.price —
+  // это цена за одного взрослого. Приводим обе к единой базе "за 1 взрослого",
+  // чтобы формула ниже работала одинаково в обоих случаях.
+  double get _pricePerAdult =>
+      widget.overridePrice != null ? widget.overridePrice! / 2 : widget.tour.price;
+
+  double get _total => _pricePerAdult * (_adults + _children * 0.7);
   double get _discount =>
       _useBonuses ? _bonusBalance.toDouble().clamp(0, _total * 0.5) : 0;
   double get _finalPrice => (_total - _discount).clamp(0, double.infinity);
@@ -1468,8 +1481,13 @@ class _BookingSheetState extends State<_BookingSheet>
           const SizedBox(height: 16),
           Text('Бронирование', style: AppTextStyles.headlineMedium),
           const SizedBox(height: 4),
-          Text(widget.tour.hotelName,
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey500)),
+          Text(
+            widget.overrideNights != null
+                ? '${widget.tour.hotelName} · ${widget.overrideNights} ноч'
+                  '${widget.overrideNights == 1 ? 'ь' : widget.overrideNights! < 5 ? 'и' : 'ей'}'
+                : widget.tour.hotelName,
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey500),
+          ),
           const Divider(height: 24),
  
           // Tourists counter
